@@ -45,15 +45,16 @@
 <script setup lang="ts">
 import { NInput, NInputGroup, NInputGroupLabel, NButton, NIcon, useMessage } from "naive-ui";
 import { Search } from "@vicons/ionicons5";
-import { usePlayer } from "~/store";
+import { usePlayer, useAccount } from "~/store";
 
 const player = usePlayer();
+const account = useAccount();
 const message = useMessage();
 
 const data = reactive({
 	youtubeUrl: "https://www.youtube.com/watch?v=eyNDCqcn3Z4",
-	playerName: "",
-	playerTag: "",
+	playerName: "the boeing",
+	playerTag: "767",
 });
 
 const handleYoutube = () => {
@@ -65,7 +66,7 @@ const handleYoutube = () => {
 	player.loadVideoByUrl(data.youtubeUrl);
 };
 
-const handlePlayerInfo = () => {
+const handlePlayerInfo = async () => {
 	if (!data.playerName || !data.playerTag) {
 		message.error("Please enter both player name and tag.");
 		return;
@@ -78,6 +79,11 @@ const handlePlayerInfo = () => {
 		message.error("Please enter valid player info.");
 		return;
 	}
+
+	account.setAccount({
+		name: data.playerName,
+		tag: data.playerTag,
+	});
 };
 </script>
 
