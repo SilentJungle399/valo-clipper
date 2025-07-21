@@ -7,6 +7,7 @@
 					:style="{ width: '50rem' }"
 					placeholder="https://youtube.com/..."
 					v-model:value="data.youtubeUrl"
+					@keydown.enter="handleYoutube"
 				/>
 				<n-button type="primary" @click="handleYoutube">
 					<n-icon size="20">
@@ -22,12 +23,14 @@
 					:style="{ width: '10rem' }"
 					placeholder="Player name"
 					v-model:value="data.playerName"
+					@keydown.enter="handlePlayerInfo"
 				/>
 				<n-input-group-label>#</n-input-group-label>
 				<n-input
 					:style="{ width: '5rem' }"
 					placeholder="Tag"
 					v-model:value="data.playerTag"
+					@keydown.enter="handlePlayerInfo"
 				/>
 				<n-button type="primary" @click="handlePlayerInfo">
 					<n-icon size="20">
@@ -42,10 +45,13 @@
 <script setup lang="ts">
 import { NInput, NInputGroup, NInputGroupLabel, NButton, NIcon, useMessage } from "naive-ui";
 import { Search } from "@vicons/ionicons5";
+import { usePlayer } from "~/store";
 
+const player = usePlayer();
 const message = useMessage();
+
 const data = reactive({
-	youtubeUrl: "",
+	youtubeUrl: "https://www.youtube.com/watch?v=eyNDCqcn3Z4",
 	playerName: "",
 	playerTag: "",
 });
@@ -56,6 +62,7 @@ const handleYoutube = () => {
 		return;
 	}
 	message.success("YouTube URL submitted: " + data.youtubeUrl);
+	player.loadVideoByUrl(data.youtubeUrl);
 };
 
 const handlePlayerInfo = () => {
