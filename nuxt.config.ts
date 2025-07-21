@@ -5,4 +5,13 @@ export default defineNuxtConfig({
 	ssr: false,
 
 	modules: ["@pinia/nuxt"],
+
+	nitro: {
+		devProxy: {
+			"/api": {
+				target: "http://localhost:8000",
+				changeOrigin: true,
+			},
+		},
+	},
 });
