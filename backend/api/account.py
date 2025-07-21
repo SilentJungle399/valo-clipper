@@ -33,7 +33,7 @@ async def fetch_account_data(name: str, tag: str):
 		
 async def fetch_matches_data(name: str, tag: str, region: str, platform: str, page: int = 1):
 	async with await get_session() as session:
-		url = f"https://api.henrikdev.xyz/valorant/v4/matches/{region}/{platform}/{name}/{tag}?size=10&page={page}"
+		url = f"https://api.henrikdev.xyz/valorant/v4/matches/{region}/{platform}/{name}/{tag}?size=10&start={(page - 1) * 10}"
 		print(url)
 		async with session.get(url) as response:
 			if response.status == 200:
@@ -47,7 +47,7 @@ async def get_account(name: str, tag: str):
 	return await fetch_account_data(name, tag)
 
 @router.get("/matches")
-async def get_matches(name: str, tag: str, page = 1):
+async def get_matches(name: str, tag: str, page: int = 1):
 	account = await fetch_account_data(name, tag)
 
 	if "error" in account:
