@@ -51,6 +51,10 @@ const player = usePlayer();
 const account = useAccount();
 const message = useMessage();
 
+const youtubeUrl = computed(() => player.youtubeUrl);
+const name = computed(() => account.name);
+const tag = computed(() => account.tag);
+
 const data = reactive({
 	youtubeUrl: "https://www.youtube.com/watch?v=eyNDCqcn3Z4",
 	playerName: "the boeing",
@@ -58,15 +62,19 @@ const data = reactive({
 });
 
 const handleYoutube = () => {
+	console.log(name.value, tag.value, youtubeUrl.value);
 	if (!data.youtubeUrl) {
 		message.error("Please enter a YouTube URL.");
 		return;
 	}
 	message.success("YouTube URL submitted: " + data.youtubeUrl);
 	player.loadVideoByUrl(data.youtubeUrl);
+
+	if (name.value && tag.value) loadMatchesFromVideo();
 };
 
 const handlePlayerInfo = async () => {
+	console.log(name.value, tag.value, youtubeUrl.value);
 	if (!data.playerName || !data.playerTag) {
 		message.error("Please enter both player name and tag.");
 		return;
@@ -84,6 +92,27 @@ const handlePlayerInfo = async () => {
 		name: data.playerName,
 		tag: data.playerTag,
 	});
+
+	if (youtubeUrl.value) loadMatchesFromVideo();
+};
+
+const loadMatchesFromVideo = async () => {
+	const videoData: any = await $fetch("/api/youtube/info", {
+		method: "GET",
+		params: {
+			url: youtubeUrl.value,
+		},
+	});
+
+	if (videoData[1].type == "cached") {
+		account.setMatchList(videoData[0]);
+	} else {
+		account.getMatchesByTime(
+			new Date(videoData.release_timestamp * 1000).toISOString(),
+			new Date(videoData.release_timestamp * 1000 + videoData.duration * 1000).toISOString(),
+			youtubeUrl.value
+		);
+	}
 };
 </script>
 

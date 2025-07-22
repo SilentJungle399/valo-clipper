@@ -83,3 +83,75 @@ async def get_matches(name: str, tag: str, page: int = 1):
 		"page": page,
 		"total": len(matches),
 	}
+
+@router.get("/match/{match_id}")
+async def get_match(name: str, tag: str, match_id: str):
+	account = await fetch_account_data(name, tag)
+	if "error" in account:
+		return account
+	
+	data = account.get("data", {})
+	region = data.get("region", "na")
+
+	url = f"https://api.henrikdev.xyz/valorant/v4/match/{region}/{match_id}"
+	async with await get_session() as session:
+		async with session.get(url) as response:
+			if response.status == 200:
+				_match = await response.json()
+
+				await mongo.db.extended.update_one(
+					{"match_id": _match["metadata"]["match_id"]},
+					{"$set": _match},
+					upsert=True
+				)
+
+				return _match
+			else:
+				return {"error": "Match not found"}, response.status
+
+@router.get("/matches/time")
+async def get_matches_by_time(name: str, tag: str, start: datetime, end: datetime, url: str):
+	check = await mongo.db.summary.find_one({"url": url})
+	if check and "matches" in check:
+		return check["matches"], {"message": "Matches already fetched."}
+
+	account = await fetch_account_data(name, tag)
+
+	if "error" in account:
+		return account
+
+	data = account.get("data", {})
+	region = data.get("region", "na")
+	platform = "pc"
+
+	page = 1
+	found = []
+
+	run = True
+
+	while run:
+		matchlist = await fetch_matches_data(name, tag, region, platform, page)
+		if "error" in matchlist:
+			return found, matchlist
+		
+		if not matchlist.get("data"):
+			break
+
+		for _match in matchlist["data"]:
+			match_time = datetime.fromisoformat(_match["metadata"]["started_at"])
+
+			if start <= match_time <= end:
+				found.append(_match)
+			elif match_time < start:
+				run = False
+				break
+
+		page += 1
+
+	await mongo.db.summary.update_one(
+		{"url": url},
+		{"$set": {"matches": found}},
+		upsert=True
+	)
+
+	return found, {"message": "Matches fetched successfully."}
