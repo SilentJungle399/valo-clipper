@@ -1,27 +1,26 @@
 import { defineStore } from "pinia";
+import { useSeekbar, useAccount } from ".";
 
 export default defineStore("player", () => {
 	const YTplayer = ref<any>(null);
 	const state = ref(-1);
+	const duration = ref(0);
+	const youtubeUrl = ref("");
 
 	const setYTplayer = (player: any) => {
 		if (YTplayer.value) return;
 		YTplayer.value = player;
 
-		/* TODO - for external seekbar */
-		// const seekbar = useSeekbar();
-		// const queue = useQueue();
-		// const current = computed(() => queue.current);
-		// setInterval(() => {
-		// 	if (YTplayer.value.getCurrentTime && current) {
-		// 		const currentPos = YTplayer.value.getCurrentTime();
-		// 		progress.value = currentPos;
-		// 		const duration = YTplayer.value.getDuration();
-		// 		seekbar.setProgress((currentPos / duration) * 100, true);
-		// 	} else {
-		// 		seekbar.setProgress(0, true);
-		// 	}
-		// }, 100);
+		const seekbar = useSeekbar();
+		setInterval(() => {
+			if (YTplayer.value.getCurrentTime && [1, 2, 3].includes(state.value)) {
+				const currentPos = YTplayer.value.getCurrentTime();
+				duration.value = YTplayer.value.getDuration();
+				seekbar.setProgress(currentPos, true);
+			} else {
+				seekbar.setProgress(0, true);
+			}
+		}, 100);
 	};
 
 	const events = {
@@ -45,11 +44,11 @@ export default defineStore("player", () => {
 	};
 
 	const loadVideoByUrl = (url: string) => {
-		console.log(url);
 		if (YTplayer.value && YTplayer.value.loadVideoByUrl) {
 			YTplayer.value.loadVideoByUrl(
 				`http://www.youtube.com/v/${url.split("?v=")[1]}?version=3&rel=0&modestbranding=1`
 			);
+			youtubeUrl.value = url;
 		}
 	};
 
@@ -57,6 +56,8 @@ export default defineStore("player", () => {
 		YTplayer,
 		events,
 		state,
+		duration,
+		youtubeUrl,
 		setYTplayer,
 		loadVideoByUrl,
 	};
