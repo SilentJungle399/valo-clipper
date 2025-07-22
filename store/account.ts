@@ -6,6 +6,8 @@ export default defineStore("account", () => {
 
 	const profile = ref<any>(null);
 
+	const matchList = ref<any[]>([]);
+
 	const setAccount = async (account: { name: string; tag: string }) => {
 		name.value = account.name;
 		tag.value = account.tag;
@@ -35,11 +37,31 @@ export default defineStore("account", () => {
 		return matches;
 	};
 
+	const getMatchesByTime = async (start: string, end: string, url: string) => {
+		const matches: any[] = await $fetch("/api/account/matches/time", {
+			params: {
+				name: name.value,
+				tag: tag.value,
+				start: start,
+				end: end,
+				url: url,
+			},
+		});
+		matchList.value = matches[0];
+	};
+
+	const setMatchList = (matches: any[]) => {
+		matchList.value = matches;
+	};
+
 	return {
 		name,
 		tag,
+		matchList,
 		profile,
 		setAccount,
 		getMatches,
+		setMatchList,
+		getMatchesByTime,
 	};
 });
