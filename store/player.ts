@@ -6,6 +6,11 @@ export default defineStore("player", () => {
 	const state = ref(-1);
 	const duration = ref(0);
 	const youtubeUrl = ref("");
+	const offset = ref(0);
+
+	const setOffset = (newOffset: number) => {
+		offset.value = newOffset;
+	};
 
 	const setYTplayer = (player: any) => {
 		if (YTplayer.value) return;
@@ -56,6 +61,8 @@ export default defineStore("player", () => {
 		YTplayer,
 		events,
 		state,
+		offset,
+		setOffset,
 		duration,
 		youtubeUrl,
 		setYTplayer,

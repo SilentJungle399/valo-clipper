@@ -1,38 +1,6 @@
 <template>
 	<n-card v-if="currentMatch" style="max-width: 1200px">
-		{{ calcDuration(progress * 1000) }} {{ progress * 1000 }} <br />
-		{{
-			calcDuration(
-				new Date(currentMatch.metadata.started_at).getTime() -
-					new Date(streamStart).getTime()
-			)
-		}}
-		{{ new Date(currentMatch.metadata.started_at).getTime() - new Date(streamStart).getTime()
-		}}<br />
-
-		{{
-			calcDuration(
-				progress * 1000 -
-					(new Date(currentMatch.metadata.started_at).getTime() -
-						new Date(streamStart).getTime())
-			)
-		}}
-
-		{{
-			progress * 1000 -
-			(new Date(currentMatch.metadata.started_at).getTime() - new Date(streamStart).getTime())
-		}}
 		<n-flex style="gap: 20px" vertical>
-			<n-flex style="gap: 30px">
-				<n-flex vertical>
-					<span style="font-weight: bold; color: #9ca3af">Global time offset:</span>
-					<n-input-number v-model:value="globalOffset" style="max-width: 150px" />
-				</n-flex>
-				<n-flex vertical>
-					<span style="font-weight: bold; color: #9ca3af">Skip time offset:</span>
-					<n-input-number v-model:value="skipOffset" style="max-width: 150px" />
-				</n-flex>
-			</n-flex>
 			<n-flex>
 				<n-button
 					@click="() => seekToKill(previousKill + timeDiff + offset * 1000)"
@@ -40,33 +8,51 @@
 				>
 					Previous kill
 				</n-button>
-				<n-button
-					@click="() => seekToKill(nextKill + timeDiff - skipOffset + offset * 1000)"
-					tertiary
-				>
+				<n-button @click="() => seekToKill(nextKill + timeDiff + offset * 1000)" tertiary>
 					Next kill
 				</n-button>
 			</n-flex>
 			<n-flex>
-				<n-button
+				<div
 					v-for="kill in filterKills(currentMatch.kills)"
 					:key="kill.time_in_match_in_ms"
 					class="kill-button"
-					@click="() => seekToKill(kill.time_in_match_in_ms + timeDiff + offset * 1000)"
-					:type="nextKill === kill.time_in_match_in_ms ? 'primary' : 'default'"
-					ghost
+					:style="{
+						border: 'solid 1px',
+						borderRadius: '3px',
+						borderColor:
+							nextKillPreview === kill.time_in_match_in_ms
+								? '#6d8cad'
+								: 'rgba(255, 255, 255, 0.09)',
+						transition: 'border-color 0.2s',
+						padding: '5px 10px',
+						display: 'flex',
+						alignItems: 'center',
+					}"
 				>
-					<!-- {{ kill.killer.name }} - -->
-					{{ calcDuration(kill.time_in_match_in_ms + timeDiff + offset * 1000) }}
-					{{ kill.round }}
-				</n-button>
+					<n-checkbox></n-checkbox>
+					<n-button
+						@click="
+							() => seekToKill(kill.time_in_match_in_ms + timeDiff + offset * 1000)
+						"
+						text
+						icon-placement="right"
+						style="margin-left: 5px"
+					>
+						Round {{ kill.round }} - {{ kill.weapon.name ?? "Knife" }}
+						<template #icon>
+							<n-icon size="16"><OpenOutline /></n-icon>
+						</template>
+					</n-button>
+				</div>
 			</n-flex>
 		</n-flex>
 	</n-card>
 </template>
 
 <script setup lang="ts">
-import { NCard, NFlex, NButton, NInputNumber } from "naive-ui";
+import { NCard, NFlex, NButton, NCheckbox, NIcon } from "naive-ui";
+import { OpenOutline } from "@vicons/ionicons5";
 import { useAccount, useSeekbar, usePlayer } from "~/store";
 
 const accountStore = useAccount();
@@ -76,13 +62,14 @@ const player = usePlayer();
 const currentMatch = ref();
 const timeDiff = ref(0);
 
-const globalOffset = ref(48.5);
-const skipOffset = ref(3);
-const offset = computed(() => globalOffset.value + skipOffset.value);
+// const globalOffset = ref(48.5);
+// // const skipOffset = ref(3);
+// const offset = computed(() => globalOffset.value);
 
 const progress = computed(() => seekbar.progress);
 const streamStart = computed(() => accountStore.matchList.start);
 const profile = computed(() => accountStore.profile);
+const offset = computed(() => player.offset);
 
 const matchList = computed(() => {
 	return accountStore.matchList.matches.sort((a, b) => {
@@ -97,6 +84,18 @@ const nextKill = computed(() => {
 	const ret = kills.filter((kill) => {
 		return (
 			kill.time_in_match_in_ms + timeDiff.value + offset.value * 1000 >= progress.value * 1000
+		);
+	});
+
+	return ret.length > 0 ? ret[0].time_in_match_in_ms : null;
+});
+
+const nextKillPreview = computed(() => {
+	const kills = filterKills(currentMatch.value.kills);
+	const ret = kills.filter((kill) => {
+		return (
+			kill.time_in_match_in_ms + timeDiff.value + offset.value * 1000 + 1000 >=
+			progress.value * 1000
 		);
 	});
 
@@ -149,10 +148,6 @@ watch(
 	{ immediate: true }
 );
 
-watch(currentMatch, (newMatch) => {
-	console.log(newMatch);
-});
-
 const calcDuration = (_value: number) => {
 	const value = Math.floor(_value / 1000);
 	const hour = Math.floor(value / 3600);
@@ -161,12 +156,13 @@ const calcDuration = (_value: number) => {
 	const ms = Math.floor(_value % 1000);
 
 	// prettier-ignore
-	return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}.${ms}`;
+	return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`;
 };
 </script>
 
-<style>
-.match {
-	max-width: 300px;
+<style scoped>
+.kill-button .n-button {
+	padding: 2px;
+	height: auto;
 }
 </style>
