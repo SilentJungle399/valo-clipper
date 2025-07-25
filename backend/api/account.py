@@ -139,8 +139,9 @@ async def get_matches_by_time(name: str, tag: str, start: datetime, end: datetim
 
 		for _match in matchlist["data"]:
 			match_time = datetime.fromisoformat(_match["metadata"]["started_at"])
+			match_end = match_time + timedelta(seconds=_match["metadata"]["game_length_in_ms"] / 1000)
 
-			if start <= match_time <= end:
+			if start <= match_time <= end or start <= match_end <= end:
 				found.append(_match)
 			elif match_time < start:
 				run = False
