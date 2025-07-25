@@ -5,7 +5,10 @@
 				<div class="container">
 					<InputForm></InputForm>
 					<YTVideo></YTVideo>
-					<ClipWindow></ClipWindow>
+					<!-- <Timeline></Timeline> -->
+					<KillsWindow></KillsWindow>
+					<VideoBrief></VideoBrief>
+					<!-- <ClipWindow></ClipWindow> -->
 				</div>
 			</div>
 		</n-message-provider>
@@ -26,6 +29,7 @@ body {
 	display: flex;
 	justify-content: center;
 	margin-top: 50px;
+	margin-bottom: 50px;
 }
 
 .container {

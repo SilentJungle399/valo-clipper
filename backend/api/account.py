@@ -150,8 +150,8 @@ async def get_matches_by_time(name: str, tag: str, start: datetime, end: datetim
 
 	await mongo.db.summary.update_one(
 		{"url": url},
-		{"$set": {"matches": found}},
+		{"$set": {"matches": found, "start": start.isoformat()}},
 		upsert=True
 	)
 
-	return found, {"message": "Matches fetched successfully."}
+	return {"matches": found, "start": start}, {"message": "Matches fetched successfully."}

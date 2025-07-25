@@ -108,8 +108,10 @@ const loadMatchesFromVideo = async () => {
 		account.setMatchList(videoData[0]);
 	} else {
 		account.getMatchesByTime(
-			new Date(videoData.release_timestamp * 1000).toISOString(),
-			new Date(videoData.release_timestamp * 1000 + videoData.duration * 1000).toISOString(),
+			new Date(videoData[0].release_timestamp * 1000).toISOString(),
+			new Date(
+				videoData[0].release_timestamp * 1000 + videoData[0].duration * 1000
+			).toISOString(),
 			youtubeUrl.value
 		);
 	}

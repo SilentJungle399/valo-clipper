@@ -14,7 +14,7 @@ async def get_video_info(url: str):
 	check = await mongo.db.summary.find_one({"url": url})
 	if check:
 		check.pop("_id", None)
-		return check["matches"], {"type": "cached"}
+		return check, {"type": "cached"}
 
 	async with await get_session() as session:
 		ydl_opts = {
