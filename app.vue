@@ -6,6 +6,7 @@
 					<InputForm></InputForm>
 					<YTVideo></YTVideo>
 					<!-- <Timeline></Timeline> -->
+					<OffsetWindow></OffsetWindow>
 					<KillsWindow></KillsWindow>
 					<VideoBrief></VideoBrief>
 					<!-- <ClipWindow></ClipWindow> -->
