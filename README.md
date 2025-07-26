@@ -4,7 +4,7 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ## Setup
 
-This needs FFmpeg. Download it from https://ffmpeg.org/download.html and copy `ffmpeg.exe` to the root of this project.
+> This needs FFmpeg. Download it from https://ffmpeg.org/download.html and copy `ffmpeg.exe` to the root of this project.
 
 Backend is in `backend/` directory.
 
