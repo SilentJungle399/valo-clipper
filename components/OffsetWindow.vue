@@ -172,8 +172,8 @@ watch(currentMatch, (newMatch) => {
 });
 
 onMounted(() => {
-	globalOffset.value = 102; // TODO REMOVE THIS
-	showRoundSelector.value = false; // TODO REMOVE THIS
+	// globalOffset.value = 102; // TODO REMOVE THIS
+	// showRoundSelector.value = false; // TODO REMOVE THIS
 });
 </script>
 
