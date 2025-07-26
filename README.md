@@ -4,6 +4,12 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 ## Setup
 
+This needs FFmpeg. Download it from https://ffmpeg.org/download.html and copy `ffmpeg.exe` to the root of this project.
+
+Backend is in `backend/` directory.
+
+Install dependencies through `pip install -r requirements.txt` and you can run it using `uvicorn backend.main:app --reload`.
+
 Make sure to install dependencies:
 
 ```bash

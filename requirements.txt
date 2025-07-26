@@ -1,0 +1,5 @@
+yt-dlp
+fastapi[standard]
+aiohttp
+motor
+python-dotenv

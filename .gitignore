@@ -23,3 +23,10 @@ __pycache__
 .env
 .env.*
 !.env.example
+
+# test files
+test*
+*.mp4
+
+# large files
+ffmpeg.exe
